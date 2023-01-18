@@ -1,36 +1,61 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use infix" #-}
 module A6 where
 
 import Provided
 
 import Data.List ( intersperse, sort )
+import Data.Char
 
 -- *** A6-0: WARM-UP *** --
 
 -- Q#01
-
+type Chances = Int
+type Guess = String
+type Move = Char
+type Secret = String
+type Dictionary = [String]
 
 -- Q#02
-data GameException
+data GameException = InvalidWord | InvalidMove | RepeatMove | GameOver
 
 -- Q#03
 
-lengthInRange = undefined
+lengthInRange :: Secret -> Bool
+lengthInRange s =
+  let (x, y) = _LENGTH_ in
+    length s >= x && length s <= y
 
 -- Q#04
 
-invalidMove = undefined
+invalidMove :: Move -> Bool
+invalidMove m =
+  not $ isAlpha m
 
 -- Q#05
 
-revealLetters = undefined
+revealLetters :: Move -> Secret -> Guess -> Guess
+revealLetters m s g =
+  zipWith f s g
+  where
+    f s_itr g_itr = if s_itr == m then s_itr else g_itr
 
 -- Q#06
 
-updateChances = undefined
+updateChances :: Move -> Secret -> Chances -> Chances
+updateChances m s c =
+  if elem m s then c else c - 1
 
 -- Q#07
 
-setSecret = undefined
+setSecret :: IO Secret
+setSecret = do
+  putStr "Enter a secret word:\t"
+  showInput False
+  s <- getLine
+  showInput True
+  _SPACE_
+  return s
 
 
 -- *** A6-1: Records & Instances *** --
