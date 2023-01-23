@@ -61,15 +61,29 @@ setSecret = do
 -- *** A6-1: Records & Instances *** --
 
 -- Q#08
-data Game
+data Game = Game {
+    secret :: Secret
+  , guess :: Guess
+  , moves :: [Move]
+  , chances :: Chances
+  } deriving Show
 
 -- Q#09
 
-repeatedMove = undefined
+repeatedMove :: Move -> Game -> Bool
+repeatedMove m g =
+  elem m $ moves g
 
 -- Q#10
 
-makeGame = undefined
+makeGame :: Secret -> Game
+makeGame s =
+  Game {
+    secret = map toUpper s,
+    guess = map (const '_') s,
+    moves = [],
+    chances = _CHANCES_
+  }
 
 -- Q#11
 
