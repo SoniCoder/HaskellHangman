@@ -66,7 +66,7 @@ data Game = Game {
   , guess :: Guess
   , moves :: [Move]
   , chances :: Chances
-  } deriving Show
+  }
 
 -- Q#09
 
@@ -87,7 +87,14 @@ makeGame s =
 
 -- Q#11
 
-updateGame = undefined
+updateGame :: Move -> Game -> Game 
+updateGame m g =
+  let updatedGuess = revealLetters m (secret g) (guess g)
+    in g {
+      guess = updatedGuess,
+      moves = m : moves g,
+      chances = updateChances m (secret g) (chances g)
+    }
 
 -- Q#12
 
@@ -100,9 +107,18 @@ showGameHelper game moves chances = unlines [
     , _STARS_
     ]
 
+instance Show Game where
+  show g = showGameHelper (guess g) (moves g) (chances g)
 
 -- Q#13
-
+instance Show GameException where
+  show InvalidWord = concat ["Invalid word, length must be between ", lb, " and ", " characters."]
+        where
+            lb = show $ fst _LENGTH_
+            ub = show $ snd _LENGTH_
+  show InvalidMove = "Invalid move"
+  show RepeatMove = "Repeat move"
+  show GameOver = "Game over"
 
 -- *** A6-2: Exception Contexts *** --
 
