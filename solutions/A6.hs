@@ -87,7 +87,7 @@ makeGame s =
 
 -- Q#11
 
-updateGame :: Move -> Game -> Game 
+updateGame :: Move -> Game -> Game
 updateGame m g =
   let updatedGuess = revealLetters m (secret g) (guess g)
     in g {
@@ -124,28 +124,46 @@ instance Show GameException where
 
 -- Q#14
 
-toMaybe = undefined
+toMaybe :: Bool -> a -> Maybe a
+toMaybe False x = Nothing
+toMaybe True x = Just x
 
 -- Q#15
 
-validateSecret = undefined
+validateSecret :: (Secret -> Bool) -> Secret -> Either GameException Secret
+validateSecret p s = if p s then Right s else Left InvalidWord
 
 -- Q#16
 
-hasValidChars = undefined
+hasValidChars :: Secret -> Either GameException Secret
+hasValidChars s = validateSecret (all isAlpha) s
 
 
-isValidLength = undefined
+isValidLength :: Secret -> Either GameException Secret
+isValidLength s = validateSecret lengthInRange s
 
 
-isInDict = undefined
+isInDict :: Dictionary -> Secret -> Either GameException Secret
+isInDict d s = validateSecret (\s0 -> elem (map toLower s0) d) s
 
 -- Q#17
 
-validateNoDict = undefined
+validateNoDict :: Secret -> Either GameException Secret
+validateNoDict s = case hasValidChars s of
+  Left e -> Left e
+  Right s -> isValidLength s
 
-validateWithDict = undefined
+validateWithDict :: Dictionary -> Secret -> Either GameException Secret
+validateWithDict d s = case validateNoDict s of
+  Left e -> Left e
+  Right s -> isInDict d s
 
 -- Q#18
 
-processTurn = undefined
+processTurn :: Move -> Game -> Either GameException Game
+processTurn m g
+  | invalidMove m = Left InvalidMove
+  | repeatedMove m g = Left RepeatMove
+  | chances updatedGame == 0 = Left GameOver
+  | otherwise = Right updatedGame
+    where updatedGame = updateGame m g
