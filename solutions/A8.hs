@@ -56,13 +56,32 @@ runApp = do
 
 -- Q#05
 
-makeGameS = undefined
+makeGameS :: Secret -> State Game ()
+makeGameS s =
+    put $ makeGame s
 
 
-updateGameS = undefined
+updateGameS :: Move -> Game -> State Game ()
+updateGameS m g = modify (updateGame m)
+ 
 
 
-repeatedMoveS = undefined
+repeatedMoveS :: Move -> Game -> State Game Bool
+repeatedMoveS m g = do
+    gets moves
+    return $ repeatedMove m g
 
 
-processTurnS = undefined
+processTurnS :: Move -> Game -> State Game (Either GameException ())
+processTurnS move g | invalidMove move = pure $ Left InvalidMove
+processTurnS move g = do
+    g <- get
+    repeated <- repeatedMoveS move g
+    if repeated
+        then pure $ Left RepeatMove
+        else do
+            updateGameS move g
+            c <- gets chances
+            if c == 0
+                then pure $ Left GameOver
+                else pure $ Right ()
